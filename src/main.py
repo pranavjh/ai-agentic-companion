@@ -156,6 +156,36 @@ def generate_podcast(
 
 
 @app.command()
+def ingest(
+    force: bool = typer.Option(False, "--force", "-f", help="Force reindex all files (ignore processed status)"),
+    batch_size: int = typer.Option(10, "--batch-size", "-b", help="Number of files to process per batch")
+):
+    """
+    Ingest PDF corpus into vector database
+
+    This command processes PDFs from the configured corpus path, extracts text,
+    chunks it, generates embeddings, and stores in ChromaDB.
+
+    Features:
+    - Incremental updates (only processes new/modified files)
+    - Hash-based change detection
+    - Progress tracking with rich output
+
+    Examples:
+      python src/main.py ingest
+      python src/main.py ingest --force  # Reprocess all files
+    """
+    from knowledge.ingest import KnowledgeBaseIngester
+
+    try:
+        ingester = KnowledgeBaseIngester()
+        ingester.ingest_corpus(force_reindex=force, batch_size=batch_size)
+    except Exception as e:
+        console.print(f"\n[red]Error during ingestion:[/red] {e}")
+        raise typer.Exit(code=1)
+
+
+@app.command()
 def status():
     """Show project status and configuration"""
     console.print(Panel.fit(
@@ -177,9 +207,22 @@ def status():
         else:
             console.print(f"\n[red]✗[/red] Corpus directory not found at {corpus_path}")
 
+        # Check if vector DB exists
+        vector_db_path = Path(config['vector_db']['persist_directory'])
+        if vector_db_path.exists():
+            from knowledge.vector_store import VectorStoreManager
+            vs = VectorStoreManager(
+                persist_directory=str(vector_db_path),
+                collection_name=config['vector_db']['collection_name']
+            )
+            stats = vs.get_stats()
+            console.print(f"[green]✓[/green] Vector DB found ({stats['total_chunks']} chunks, {stats['processed_files']} files)")
+        else:
+            console.print(f"[yellow]⧖[/yellow] Vector DB not yet created")
+
         console.print("\n[yellow]Implementation Status:[/yellow]")
         console.print("  - Phase 1: Project Setup [green]✓ Complete[/green]")
-        console.print("  - Phase 2: Knowledge Base Ingestion [yellow]⧖ Pending[/yellow]")
+        console.print("  - Phase 2: Knowledge Base Ingestion [green]✓ Complete[/green]")
         console.print("  - Phase 3: Q&A Chatbot [yellow]⧖ Pending[/yellow]")
         console.print("  - Phase 4: LinkedIn Generator [yellow]⧖ Pending[/yellow]")
         console.print("  - Phase 5: Blog Generator [yellow]⧖ Pending[/yellow]")
