@@ -48,41 +48,104 @@ def load_config():
 @app.command()
 def chat(
     question: str = typer.Argument(None, help="Question to ask (interactive mode if not provided)"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show source references")
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show source references and retrieval details")
 ):
     """
     Interactive Q&A chatbot using the AI and Agentic knowledge base
 
+    Features:
+    - Retrieves relevant information from your knowledge base
+    - Enhances answers with latest information from GPT-4o
+    - Maintains conversation continuity (last 10 messages)
+    - Provides source citations
+
     Examples:
       python src/main.py chat "What are the key principles of agentic AI?"
       python src/main.py chat --verbose
+      python src/main.py chat  # Interactive mode
     """
+    from agents.qa_agent import QAAgent
+    from retrieval.context_builder import ContextBuilder
+
     console.print(Panel.fit(
         "[bold cyan]Q&A Chatbot[/bold cyan]\n"
-        "Ask questions about AI and Agents",
+        "Ask questions about AI and Agents\n"
+        "[dim]Knowledge base ready with 2,168 chunks from 136 documents[/dim]",
         border_style="cyan"
     ))
 
-    if question:
-        console.print(f"\n[yellow]Question:[/yellow] {question}")
-        console.print("\n[dim]Processing... (Knowledge base not yet initialized)[/dim]")
-        console.print("\n[red]Note:[/red] Q&A agent not yet implemented. Coming in Phase 3.")
-    else:
-        console.print("\n[yellow]Interactive mode[/yellow]")
-        console.print("[dim]Type 'exit' or 'quit' to end the session[/dim]\n")
+    try:
+        # Initialize Q&A agent
+        agent = QAAgent()
+        context_builder = ContextBuilder()
 
-        while True:
-            try:
-                user_input = typer.prompt("You")
-                if user_input.lower() in ['exit', 'quit']:
-                    console.print("\n[cyan]Goodbye![/cyan]")
+        if question:
+            # Single question mode
+            console.print(f"\n[yellow]Question:[/yellow] {question}\n")
+
+            # Get answer
+            with console.status("[cyan]Thinking...[/cyan]"):
+                result = agent.answer(question, verbose=verbose)
+
+            # Display answer
+            console.print(f"[green]Answer:[/green]\n{result['answer']}\n")
+
+            # Display sources
+            if result['sources'] or not result['has_kb_sources']:
+                sources_display = context_builder.format_sources_for_display(
+                    result['sources'],
+                    include_general=True
+                )
+                console.print(sources_display)
+
+        else:
+            # Interactive mode
+            console.print("\n[yellow]Interactive mode[/yellow]")
+            console.print("[dim]Type 'exit', 'quit', or 'clear' (to reset conversation)[/dim]\n")
+
+            while True:
+                try:
+                    user_input = typer.prompt("\n[bold cyan]You[/bold cyan]")
+
+                    if user_input.lower() in ['exit', 'quit']:
+                        console.print(f"\n[cyan]Goodbye! ({agent.get_conversation_summary()})[/cyan]")
+                        break
+
+                    if user_input.lower() == 'clear':
+                        agent.clear_history()
+                        console.print("[yellow]Conversation history cleared[/yellow]")
+                        continue
+
+                    if not user_input.strip():
+                        continue
+
+                    # Get answer
+                    with console.status("[cyan]Thinking...[/cyan]"):
+                        result = agent.answer(user_input, verbose=verbose)
+
+                    # Display answer
+                    console.print(f"\n[bold green]Assistant:[/bold green]\n{result['answer']}")
+
+                    # Display sources
+                    if result['sources'] or not result['has_kb_sources']:
+                        sources_display = context_builder.format_sources_for_display(
+                            result['sources'],
+                            include_general=True
+                        )
+                        console.print(sources_display)
+
+                    # Show conversation stats if verbose
+                    if verbose:
+                        console.print(f"\n[dim]Conversation: {result['conversation_length']} messages | Retrieved: {result['num_chunks']} chunks[/dim]")
+
+                except (KeyboardInterrupt, EOFError):
+                    console.print(f"\n\n[cyan]Goodbye! ({agent.get_conversation_summary()})[/cyan]")
                     break
 
-                console.print("\n[dim]Processing... (Knowledge base not yet initialized)[/dim]")
-                console.print("[red]Note:[/red] Q&A agent not yet implemented. Coming in Phase 3.\n")
-            except (KeyboardInterrupt, EOFError):
-                console.print("\n\n[cyan]Goodbye![/cyan]")
-                break
+    except Exception as e:
+        console.print(f"\n[red]Error initializing Q&A agent:[/red] {e}")
+        console.print("[yellow]Make sure you've run 'python src/main.py ingest' first[/yellow]")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command("linkedin")
@@ -223,7 +286,7 @@ def status():
         console.print("\n[yellow]Implementation Status:[/yellow]")
         console.print("  - Phase 1: Project Setup [green]✓ Complete[/green]")
         console.print("  - Phase 2: Knowledge Base Ingestion [green]✓ Complete[/green]")
-        console.print("  - Phase 3: Q&A Chatbot [yellow]⧖ Pending[/yellow]")
+        console.print("  - Phase 3: Q&A Chatbot [green]✓ Complete[/green]")
         console.print("  - Phase 4: LinkedIn Generator [yellow]⧖ Pending[/yellow]")
         console.print("  - Phase 5: Blog Generator [yellow]⧖ Pending[/yellow]")
         console.print("  - Phase 6: Podcast Generator [yellow]⧖ Pending[/yellow]")

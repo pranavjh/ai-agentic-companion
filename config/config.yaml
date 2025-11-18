@@ -29,7 +29,7 @@ retrieval:
   top_k: 5  # Number of chunks to retrieve
   search_type: "hybrid"  # hybrid (semantic + keyword), semantic, or keyword
   rerank: true  # Use cross-encoder for re-ranking
-  similarity_threshold: 0.7  # Minimum similarity score
+  similarity_threshold: 0.3  # Minimum similarity score (lowered for better recall)
 
 # Agent Settings
 agents:
