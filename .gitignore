@@ -1,0 +1,42 @@
+# Virtual Environment
+venv/
+env/
+*.egg-info/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Data & Vector DB (too large for git)
+data/
+*.db
+*.sqlite
+*.index
+
+# Generated Output
+output/
+
+# Configuration & Secrets
+config/secrets/
+.env
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+.cache/

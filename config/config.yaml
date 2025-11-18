@@ -1,0 +1,121 @@
+# AI Agentic Companion Configuration
+
+# Corpus Settings
+corpus:
+  path: "/Users/pranav/Downloads/AI and Agentic"
+  file_types: ["pdf"]
+  max_file_size_mb: 50  # Skip files larger than this
+
+# OpenAI Models
+models:
+  llm: "gpt-4o"  # Primary model for all agents
+  embedding: "text-embedding-3-large"  # For vector embeddings
+  tts: "tts-1-hd"  # For podcast audio generation
+
+# Vector Database
+vector_db:
+  type: "chromadb"  # Using ChromaDB for local storage
+  persist_directory: "data/vector_db"
+  collection_name: "ai_agentic_knowledge"
+
+# PDF Processing & Chunking
+chunking:
+  chunk_size: 1500  # tokens per chunk
+  chunk_overlap: 200  # overlap between chunks
+  strategy: "semantic"  # semantic, fixed, or recursive
+
+# Retrieval & Search
+retrieval:
+  top_k: 5  # Number of chunks to retrieve
+  search_type: "hybrid"  # hybrid (semantic + keyword), semantic, or keyword
+  rerank: true  # Use cross-encoder for re-ranking
+  similarity_threshold: 0.7  # Minimum similarity score
+
+# Agent Settings
+agents:
+  qa:
+    name: "Q&A Agent"
+    temperature: 0.3  # Lower for factual answers
+    max_tokens: 1000
+    system_prompt_file: "config/prompts/qa_agent.txt"
+
+  linkedin:
+    name: "LinkedIn Post Generator"
+    temperature: 0.7  # Higher for creative content
+    max_tokens: 500  # LinkedIn posts are shorter
+    system_prompt_file: "config/prompts/linkedin_agent.txt"
+
+  blog:
+    name: "Blog Generator"
+    temperature: 0.7
+    max_tokens: 3000  # Longer form content
+    system_prompt_file: "config/prompts/blog_agent.txt"
+
+  podcast:
+    name: "Podcast Script Generator"
+    temperature: 0.8  # More conversational
+    max_tokens: 4000
+    system_prompt_file: "config/prompts/podcast_agent.txt"
+
+# LinkedIn Post Settings
+linkedin:
+  max_length: 3000  # LinkedIn character limit
+  include_hashtags: true
+  num_hashtags: 5
+  tone: "professional"  # professional, casual, inspirational
+
+# Blog Settings
+blog:
+  format: "markdown"
+  include_toc: true  # Table of contents
+  include_citations: true
+  tone: "informative"  # informative, conversational, technical
+
+# Podcast Settings
+podcast:
+  format: "mp3"
+  sample_rate: 44100
+  bit_rate: "192k"
+  num_speakers: 2  # Host and guest format
+
+  # TTS Voices for podcast
+  voices:
+    host:
+      provider: "openai"
+      voice_id: "onyx"  # Male voice
+      speed: 1.0
+
+    guest:
+      provider: "openai"
+      voice_id: "nova"  # Female voice
+      speed: 1.0
+
+  # Podcast structure
+  structure:
+    intro_duration: 30  # seconds
+    segment_duration: 180  # 3 minutes per segment
+    outro_duration: 20  # seconds
+    total_duration: 600  # 10 minutes target
+
+# Output Settings
+output:
+  base_directory: "output"
+
+  linkedin:
+    directory: "output/linkedin"
+    filename_pattern: "{date}_{topic}.txt"
+
+  blog:
+    directory: "output/blogs"
+    filename_pattern: "{date}_{topic}.md"
+
+  podcast:
+    directory: "output/podcasts"
+    filename_pattern: "{date}_{topic}.mp3"
+    save_transcript: true  # Save .txt transcript alongside audio
+
+# Metadata
+metadata:
+  include_sources: true  # Include source references
+  include_timestamps: true
+  include_confidence_scores: false

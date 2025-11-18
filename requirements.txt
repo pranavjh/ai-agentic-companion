@@ -1,0 +1,35 @@
+# Core LLM & Agent Framework
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+openai>=1.12.0
+
+# Vector Database & Embeddings
+chromadb>=0.4.22
+sentence-transformers>=2.3.0
+
+# PDF Processing
+pypdf2>=3.0.0
+pdfplumber>=0.10.0
+
+# Search & Ranking
+rank-bm25>=0.2.2
+
+# Audio Generation (for podcasts)
+pydub>=0.25.1
+elevenlabs>=0.2.0  # Optional: Higher quality TTS
+
+# CLI & Terminal UI
+typer>=0.9.0
+rich>=13.0.0
+
+# Configuration & Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0
+requests>=2.31.0
+
+# Note: Install in virtual environment to avoid conflicts
+# python3 -m venv venv
+# source venv/bin/activate  # On Windows: venv\Scripts\activate
+# pip install -r requirements.txt
