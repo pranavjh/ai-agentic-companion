@@ -8,7 +8,7 @@ Handles errors gracefully and extracts metadata.
 from pathlib import Path
 from typing import Dict, List, Optional
 import pdfplumber
-from pypdf2 import PdfReader
+from PyPDF2 import PdfReader
 from rich.console import Console
 
 console = Console()
