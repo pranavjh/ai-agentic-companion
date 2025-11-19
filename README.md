@@ -79,7 +79,15 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Configure your PDF corpus path
+# Edit config/config.yaml and update the corpus.path
+
+# Ingest your knowledge base
+python src/main.py ingest
 ```
+
+**Note:** This method requires you to have your PDF corpus available and run the ingestion process (~20-30 minutes for 944MB). See [DEPLOYMENT.md](DEPLOYMENT.md) for alternative deployment options including a ready-to-use package with pre-processed knowledge base.
 
 ### Configuration
 
