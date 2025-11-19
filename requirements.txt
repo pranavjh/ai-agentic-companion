@@ -16,6 +16,9 @@ pdfplumber>=0.10.0
 # Search & Ranking
 rank-bm25>=0.2.2
 
+# Image Generation
+Pillow>=10.0.0
+
 # Audio Generation (for podcasts)
 pydub>=0.25.1
 elevenlabs>=0.2.0  # Optional: Higher quality TTS

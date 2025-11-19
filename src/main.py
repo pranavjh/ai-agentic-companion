@@ -309,25 +309,90 @@ def generate_blog(
 @generate_app.command("podcast")
 def generate_podcast(
     topic: str = typer.Argument(..., help="Topic for the podcast episode"),
-    duration: int = typer.Option(10, help="Target duration in minutes"),
-    output: Path = typer.Option(None, "--output", "-o", help="Output file path (.mp3)")
+    length: int = typer.Option(10, "--length", "-l", help="Target length in minutes (default: 10)"),
+    format_type: str = typer.Option("conversation", "--format", "-f", help="Format: 'monologue' (single speaker) or 'conversation' (Q&A style)"),
+    host_voice: str = typer.Option("onyx", "--host-voice", help="Host voice: alloy, echo, fable, onyx, nova, shimmer"),
+    guest_voice: str = typer.Option("nova", "--guest-voice", help="Guest voice (conversation only): alloy, echo, fable, onyx, nova, shimmer"),
+    generate_audio: bool = typer.Option(True, "--audio/--no-audio", help="Generate MP3 audio file (default: True)"),
+    output: Path = typer.Option(None, "--output", "-o", help="Output file path (without extension)")
 ):
     """
-    Generate a podcast episode with two speakers
+    Generate professional podcast episodes with transcripts and optional audio
+
+    Features:
+      - Two formats: monologue (single speaker) or conversation (Q&A style)
+      - Uses knowledge base for accurate, well-researched content
+      - OpenAI TTS with multiple voice options
+      - Includes intro, main content, and outro
+      - Always generates transcript, optionally generates MP3
+
+    Formats:
+      - monologue: Single speaker presenting information
+      - conversation: Host and guest in Q&A style discussion
+
+    Available Voices:
+      - alloy: Neutral, balanced
+      - echo: Male, clear and articulate
+      - fable: Male, warm and friendly
+      - onyx: Male, deep and authoritative (default host)
+      - nova: Female, warm and engaging (default guest)
+      - shimmer: Female, bright and energetic
 
     Examples:
-      python src/main.py generate podcast "The evolution of LLMs"
-      python src/main.py generate podcast "Agentic workflows" --duration 15
+      # Conversation with audio (default)
+      python src/main.py generate podcast "The future of AI agents"
+
+      # Monologue, 5 minutes, transcript only
+      python src/main.py generate podcast "RAG systems explained" --format monologue --length 5 --no-audio
+
+      # Custom voices
+      python src/main.py generate podcast "Multi-agent collaboration" --host-voice echo --guest-voice shimmer
+
+      # Long conversation
+      python src/main.py generate podcast "Enterprise AI adoption" --length 15
     """
+    from generators.podcast_generator import PodcastGenerator
+
     console.print(Panel.fit(
         "[bold blue]Podcast Generator[/bold blue]\n"
         f"Topic: {topic}\n"
-        f"Duration: ~{duration} minutes",
+        f"Format: {format_type} | Length: ~{length} minutes\n"
+        f"Audio: {'Yes' if generate_audio else 'Transcript only'}",
         border_style="blue"
     ))
 
-    console.print("\n[dim]Generating podcast script... (Generator not yet implemented)[/dim]")
-    console.print("[red]Note:[/red] Podcast generator not yet implemented. Coming in Phase 6.\n")
+    try:
+        # Initialize generator
+        generator = PodcastGenerator()
+
+        # Generate podcast
+        result = generator.generate(
+            topic=topic,
+            length=length,
+            format_type=format_type,
+            host_voice=host_voice,
+            guest_voice=guest_voice,
+            generate_audio=generate_audio,
+            output_path=output
+        )
+
+        # Display summary
+        console.print(f"\n[bold green]✓ Podcast Generated Successfully[/bold green]")
+        console.print(f"\n[cyan]Topic:[/cyan] {result['topic']}")
+        console.print(f"[cyan]Format:[/cyan] {result['format']}")
+        console.print(f"[cyan]Word Count:[/cyan] {result['word_count']}")
+        console.print(f"[cyan]Sources:[/cyan] {result['num_sources']} knowledge base sources")
+        console.print(f"[cyan]Host Voice:[/cyan] {result['host_voice']}")
+        if result['guest_voice']:
+            console.print(f"[cyan]Guest Voice:[/cyan] {result['guest_voice']}")
+        if result['audio_path']:
+            console.print(f"[cyan]Audio:[/cyan] {result['audio_path']}")
+
+    except Exception as e:
+        console.print(f"\n[red]Error generating podcast:[/red] {e}")
+        import traceback
+        console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -401,7 +466,7 @@ def status():
         console.print("  - Phase 3: Q&A Chatbot [green]✓ Complete[/green]")
         console.print("  - Phase 4: LinkedIn Generator [green]✓ Complete[/green]")
         console.print("  - Phase 5: Blog Generator [green]✓ Complete[/green]")
-        console.print("  - Phase 6: Podcast Generator [yellow]⧖ Pending[/yellow]")
+        console.print("  - Phase 6: Podcast Generator [green]✓ Complete[/green]")
 
     except Exception as e:
         console.print(f"\n[red]Error loading configuration:[/red] {e}")
