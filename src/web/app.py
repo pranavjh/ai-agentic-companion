@@ -19,6 +19,10 @@ import secrets
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
+# Set working directory to project root
+project_root = Path(__file__).parent.parent.parent
+os.chdir(project_root)
+
 from agents.qa_agent import QAAgent
 from generators.linkedin_generator import LinkedInGenerator
 from generators.blog_generator import BlogGenerator

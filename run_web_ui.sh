@@ -10,6 +10,5 @@ echo ""
 # Activate virtual environment
 source venv/bin/activate
 
-# Start Flask application
-cd src/web
-python app.py
+# Start Flask application (from project root)
+python src/web/app.py
