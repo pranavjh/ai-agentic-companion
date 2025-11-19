@@ -243,25 +243,67 @@ def generate_linkedin(
 
 @generate_app.command("blog")
 def generate_blog(
-    topic: str = typer.Argument(..., help="Topic for the blog post"),
-    length: str = typer.Option("medium", help="Length: short, medium, long"),
-    output: Path = typer.Option(None, "--output", "-o", help="Output file path")
+    topic: str = typer.Argument(..., help="Topic for the blog article"),
+    length: str = typer.Option("medium", "--length", "-l", help="Length: short (~500 words), medium (~1000 words), long (~1500-2000 words)"),
+    create_banner: bool = typer.Option(True, "--banner/--no-banner", "-b", help="Generate banner image with DALL-E 3"),
+    output: Path = typer.Option(None, "--output", "-o", help="Output file path (.md)")
 ):
     """
-    Generate a detailed blog article
+    Generate professional blog articles with banner images
+
+    Features:
+      - Uses knowledge base for accurate, well-researched content
+      - Professional, informative tone
+      - Well-structured with sections and conclusion
+      - Optional table of contents
+      - DALL-E 3 generated banner images
+      - Source citations from knowledge base
+
+    Lengths:
+      - short: ~500 words, 3 sections
+      - medium: ~1000 words, 5 sections
+      - long: ~1500-2000 words, 7 sections
 
     Examples:
       python src/main.py generate blog "Understanding RAG systems"
-      python src/main.py generate blog "LangChain agents" --length long
+      python src/main.py generate blog "Multi-agent AI architectures" --length long
+      python src/main.py generate blog "The future of agentic AI" --no-banner
+      python src/main.py generate blog "LangChain deep dive" -o my_blog.md
     """
+    from generators.blog_generator import BlogGenerator
+
     console.print(Panel.fit(
         "[bold magenta]Blog Generator[/bold magenta]\n"
-        f"Topic: {topic}",
+        f"Topic: {topic}\n"
+        f"Length: {length} | Banner: {'Yes' if create_banner else 'No'}",
         border_style="magenta"
     ))
 
-    console.print("\n[dim]Generating blog post... (Generator not yet implemented)[/dim]")
-    console.print("[red]Note:[/red] Blog generator not yet implemented. Coming in Phase 5.\n")
+    try:
+        # Initialize generator
+        generator = BlogGenerator()
+
+        # Generate blog
+        result = generator.generate(
+            topic=topic,
+            length=length,
+            create_banner=create_banner,
+            output_path=output
+        )
+
+        # Display preview
+        console.print(f"\n[bold green]✓ Blog Generated Successfully[/bold green]")
+        console.print(f"\n[cyan]Title:[/cyan] {result['title']}")
+        console.print(f"[cyan]Word Count:[/cyan] {result['word_count']}")
+        console.print(f"[cyan]Sources:[/cyan] {result['num_sources']} knowledge base sources")
+        if result['banner_path']:
+            console.print(f"[cyan]Banner:[/cyan] {result['banner_path']}")
+
+    except Exception as e:
+        console.print(f"\n[red]Error generating blog:[/red] {e}")
+        import traceback
+        console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command("podcast")
@@ -358,7 +400,7 @@ def status():
         console.print("  - Phase 2: Knowledge Base Ingestion [green]✓ Complete[/green]")
         console.print("  - Phase 3: Q&A Chatbot [green]✓ Complete[/green]")
         console.print("  - Phase 4: LinkedIn Generator [green]✓ Complete[/green]")
-        console.print("  - Phase 5: Blog Generator [yellow]⧖ Pending[/yellow]")
+        console.print("  - Phase 5: Blog Generator [green]✓ Complete[/green]")
         console.print("  - Phase 6: Podcast Generator [yellow]⧖ Pending[/yellow]")
 
     except Exception as e:
