@@ -1,0 +1,40 @@
+# Files/folders to exclude when creating portable package
+
+# Virtual environment
+venv/
+.venv/
+
+# Vector database (can be regenerated)
+data/vector_db/
+data/processed_files.json
+
+# Generated outputs
+output/
+
+# Secrets and API keys
+config/secrets/
+
+# Git files
+.git/
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
