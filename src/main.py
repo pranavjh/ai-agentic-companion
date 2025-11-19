@@ -14,6 +14,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.markdown import Markdown
 from pathlib import Path
+from datetime import datetime
 import yaml
 import json
 
@@ -151,24 +152,93 @@ def chat(
 @generate_app.command("linkedin")
 def generate_linkedin(
     topic: str = typer.Argument(..., help="Topic for the LinkedIn post"),
-    tone: str = typer.Option("professional", help="Tone: professional, casual, inspirational"),
+    format_type: str = typer.Option("text", "--format", "-f", help="Format: text, carousel, list, story"),
+    length: str = typer.Option("medium", "--length", "-l", help="Length: short, medium, long"),
+    num_hashtags: int = typer.Option(5, "--hashtags", "-h", help="Number of hashtags to generate"),
+    custom_hashtags: str = typer.Option(None, "--custom", "-c", help="Custom hashtags (comma-separated)"),
+    create_images: bool = typer.Option(False, "--create-images", "-i", help="Create visual carousel cards (carousel format only)"),
     output: Path = typer.Option(None, "--output", "-o", help="Output file path")
 ):
     """
-    Generate a professional LinkedIn post
+    Generate professional LinkedIn posts in multiple formats
+
+    Formats:
+      - text: Standard text post with hashtags
+      - carousel: Multi-slide carousel (with optional image generation)
+      - list: Numbered list format
+      - story: Narrative/storytelling format
+
+    Features:
+      - Uses knowledge base for accurate content
+      - Auto-generates relevant hashtags
+      - Professional and engaging tone
+      - Supports custom hashtags
 
     Examples:
       python src/main.py generate linkedin "The future of agentic AI"
-      python src/main.py generate linkedin "Multi-agent systems" --tone casual
+      python src/main.py generate linkedin "RAG systems" --format carousel --create-images
+      python src/main.py generate linkedin "Multi-agent patterns" --format list --length long
+      python src/main.py generate linkedin "AI adoption" --custom "#AI,#Innovation" -o my_post.txt
     """
+    from generators.linkedin_generator import LinkedInGenerator
+
     console.print(Panel.fit(
         "[bold green]LinkedIn Post Generator[/bold green]\n"
-        f"Topic: {topic}",
+        f"Topic: {topic}\n"
+        f"Format: {format_type} | Length: {length}",
         border_style="green"
     ))
 
-    console.print("\n[dim]Generating LinkedIn post... (Generator not yet implemented)[/dim]")
-    console.print("[red]Note:[/red] LinkedIn generator not yet implemented. Coming in Phase 4.\n")
+    try:
+        # Parse custom hashtags
+        custom_tags = None
+        if custom_hashtags:
+            custom_tags = [tag.strip() if tag.startswith('#') else f'#{tag.strip()}'
+                          for tag in custom_hashtags.split(',')]
+
+        # Initialize generator
+        generator = LinkedInGenerator()
+
+        # Generate post
+        with console.status(f"[green]Generating {format_type} post...[/green]"):
+            result = generator.generate(
+                topic=topic,
+                format_type=format_type,
+                length=length,
+                num_hashtags=num_hashtags,
+                custom_hashtags=custom_tags,
+                create_images=create_images
+            )
+
+        # Display result
+        console.print("\n")
+        formatted_output = generator.format_output(result)
+        console.print(formatted_output)
+
+        # Save to file if requested
+        if output:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with open(output, 'w') as f:
+                f.write(formatted_output)
+            console.print(f"\n[green]✓ Saved to:[/green] {output}")
+        else:
+            # Auto-save to output directory
+            output_dir = Path(generator.config['output']['linkedin']['directory'])
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{timestamp}_{topic[:30].replace(' ', '_')}_{format_type}.txt"
+            filepath = output_dir / filename
+
+            with open(filepath, 'w') as f:
+                f.write(formatted_output)
+            console.print(f"\n[green]✓ Saved to:[/green] {filepath}")
+
+    except Exception as e:
+        console.print(f"\n[red]Error generating LinkedIn post:[/red] {e}")
+        import traceback
+        console.print(f"[dim]{traceback.format_exc()}[/dim]")
+        raise typer.Exit(code=1)
 
 
 @generate_app.command("blog")
@@ -287,7 +357,7 @@ def status():
         console.print("  - Phase 1: Project Setup [green]✓ Complete[/green]")
         console.print("  - Phase 2: Knowledge Base Ingestion [green]✓ Complete[/green]")
         console.print("  - Phase 3: Q&A Chatbot [green]✓ Complete[/green]")
-        console.print("  - Phase 4: LinkedIn Generator [yellow]⧖ Pending[/yellow]")
+        console.print("  - Phase 4: LinkedIn Generator [green]✓ Complete[/green]")
         console.print("  - Phase 5: Blog Generator [yellow]⧖ Pending[/yellow]")
         console.print("  - Phase 6: Podcast Generator [yellow]⧖ Pending[/yellow]")
 
