@@ -113,7 +113,7 @@ cd src/web
 python app.py
 ```
 
-Then open your browser to: **http://localhost:5000**
+Then open your browser to: **http://localhost:8000**
 
 The web UI provides:
 - 🗨️ **Q&A Chatbot** - Interactive chat interface with conversation history

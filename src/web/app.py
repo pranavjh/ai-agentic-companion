@@ -365,7 +365,7 @@ if __name__ == '__main__':
     print("🚀 AI Agentic Companion Web UI")
     print("="*60)
     print("\nStarting web server...")
-    print("\n📍 Access the application at: http://localhost:5000")
+    print("\n📍 Access the application at: http://localhost:8000")
     print("\n✨ Features available:")
     print("   • Q&A Chatbot")
     print("   • LinkedIn Post Generator")
@@ -374,4 +374,4 @@ if __name__ == '__main__':
     print("\n⏹  Press Ctrl+C to stop the server\n")
     print("="*60 + "\n")
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8000)
