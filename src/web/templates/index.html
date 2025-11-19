@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agentic Companion</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 20px;
+            background: #f8f9fa;
+        }
+
+        .nav-tabs .nav-link {
+            color: #6c757d;
+            font-weight: 500;
+            border: none;
+            padding: 15px 25px;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border: none;
+            color: #667eea;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            background: white;
+            border: none;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .chat-container {
+            height: 500px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .assistant-message {
+            background: white;
+            border: 1px solid #dee2e6;
+        }
+
+        .system-message {
+            background: #ffc107;
+            color: #000;
+            text-align: center;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        .sources {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 30px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        }
+
+        .output-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .output-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+
+        .download-links {
+            margin-top: 15px;
+        }
+
+        .download-links a {
+            margin-right: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .status-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="bi bi-robot"></i> AI Agentic Companion</h1>
+                <p>Your AI-powered assistant for content creation and knowledge</p>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button">
+                        <i class="bi bi-chat-dots"></i> Q&A Chatbot
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="linkedin-tab" data-bs-toggle="tab" data-bs-target="#linkedin" type="button">
+                        <i class="bi bi-linkedin"></i> LinkedIn Posts
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="blog-tab" data-bs-toggle="tab" data-bs-target="#blog" type="button">
+                        <i class="bi bi-file-earmark-text"></i> Blog Articles
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="podcast-tab" data-bs-toggle="tab" data-bs-target="#podcast" type="button">
+                        <i class="bi bi-mic"></i> Podcasts
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="mainTabContent">
+
+                <!-- Q&A Chatbot Tab -->
+                <div class="tab-pane fade show active" id="chat" role="tabpanel">
+                    <h3><i class="bi bi-chat-dots"></i> Q&A Chatbot</h3>
+                    <p class="text-muted">Ask questions about AI and Agentic systems from your knowledge base</p>
+
+                    <div class="chat-container" id="chatMessages">
+                        <div class="message system-message">
+                            Welcome! Ask me anything about AI and Agentic systems.
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="chatInput" placeholder="Ask a question..." onkeypress="handleChatKeypress(event)">
+                        <button class="btn btn-primary" onclick="sendMessage()">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="clearChat()">
+                            <i class="bi bi-arrow-clockwise"></i> Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LinkedIn Generator Tab -->
+                <div class="tab-pane fade" id="linkedin" role="tabpanel">
+                    <h3><i class="bi bi-linkedin"></i> LinkedIn Post Generator</h3>
+                    <p class="text-muted">Generate professional LinkedIn posts in multiple formats</p>
+
+                    <form id="linkedinForm">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="linkedinTopic" class="form-label">Topic</label>
+                                <input type="text" class="form-control" id="linkedinTopic" placeholder="e.g., The future of AI agents" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="linkedinFormat" class="form-label">Format</label>
+                                <select class="form-select" id="linkedinFormat">
+                                    <option value="text">Text Post</option>
+                                    <option value="carousel">Carousel</option>
+                                    <option value="list">List</option>
+                                    <option value="story">Story</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="linkedinLength" class="form-label">Length</label>
+                                <select class="form-select" id="linkedinLength">
+                                    <option value="short">Short</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="long">Long</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="linkedinHashtags" class="form-label">Number of Hashtags</label>
+                                <input type="number" class="form-control" id="linkedinHashtags" value="5" min="1" max="10">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="linkedinCustomHashtags" class="form-label">Custom Hashtags (optional)</label>
+                                <input type="text" class="form-control" id="linkedinCustomHashtags" placeholder="#AI, #Innovation">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="linkedinCreateImages">
+                            <label class="form-check-label" for="linkedinCreateImages">
+                                Create visual carousel cards (carousel format only)
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-lightning"></i> Generate LinkedIn Post
+                        </button>
+                    </form>
+
+                    <div class="loading" id="linkedinLoading">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-3">Generating your LinkedIn post...</p>
+                    </div>
+
+                    <div id="linkedinOutput"></div>
+                </div>
+
+                <!-- Blog Generator Tab -->
+                <div class="tab-pane fade" id="blog" role="tabpanel">
+                    <h3><i class="bi bi-file-earmark-text"></i> Blog Article Generator</h3>
+                    <p class="text-muted">Generate professional blog articles with banner images</p>
+
+                    <form id="blogForm">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="blogTopic" class="form-label">Topic</label>
+                                <input type="text" class="form-control" id="blogTopic" placeholder="e.g., Understanding RAG systems in AI" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="blogLength" class="form-label">Length</label>
+                                <select class="form-select" id="blogLength">
+                                    <option value="short">Short (~500 words)</option>
+                                    <option value="medium" selected>Medium (~1000 words)</option>
+                                    <option value="long">Long (~1500-2000 words)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="blogCreateBanner" checked>
+                            <label class="form-check-label" for="blogCreateBanner">
+                                Generate banner image with DALL-E 3
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-lightning"></i> Generate Blog Article
+                        </button>
+                    </form>
+
+                    <div class="loading" id="blogLoading">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-3">Generating your blog article...</p>
+                    </div>
+
+                    <div id="blogOutput"></div>
+                </div>
+
+                <!-- Podcast Generator Tab -->
+                <div class="tab-pane fade" id="podcast" role="tabpanel">
+                    <h3><i class="bi bi-mic"></i> Podcast Episode Generator</h3>
+                    <p class="text-muted">Generate podcast episodes with transcripts and audio</p>
+
+                    <form id="podcastForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="podcastTopic" class="form-label">Topic</label>
+                                <input type="text" class="form-control" id="podcastTopic" placeholder="e.g., Multi-agent collaboration" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="podcastLength" class="form-label">Length (minutes)</label>
+                                <input type="number" class="form-control" id="podcastLength" value="10" min="1" max="60">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="podcastFormat" class="form-label">Format</label>
+                                <select class="form-select" id="podcastFormat">
+                                    <option value="monologue">Monologue</option>
+                                    <option value="conversation" selected>Conversation</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="podcastHostVoice" class="form-label">Host Voice</label>
+                                <select class="form-select" id="podcastHostVoice">
+                                    <option value="alloy">Alloy - Neutral, balanced</option>
+                                    <option value="echo">Echo - Male, clear</option>
+                                    <option value="fable">Fable - Male, warm</option>
+                                    <option value="onyx" selected>Onyx - Male, authoritative</option>
+                                    <option value="nova">Nova - Female, engaging</option>
+                                    <option value="shimmer">Shimmer - Female, energetic</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="podcastGuestVoice" class="form-label">Guest Voice (conversation only)</label>
+                                <select class="form-select" id="podcastGuestVoice">
+                                    <option value="alloy">Alloy - Neutral, balanced</option>
+                                    <option value="echo">Echo - Male, clear</option>
+                                    <option value="fable">Fable - Male, warm</option>
+                                    <option value="onyx">Onyx - Male, authoritative</option>
+                                    <option value="nova" selected>Nova - Female, engaging</option>
+                                    <option value="shimmer">Shimmer - Female, energetic</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="podcastGenerateAudio" checked>
+                            <label class="form-check-label" for="podcastGenerateAudio">
+                                Generate MP3 audio file (takes longer)
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-lightning"></i> Generate Podcast
+                        </button>
+                    </form>
+
+                    <div class="loading" id="podcastLoading">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-3">Generating your podcast episode...</p>
+                    </div>
+
+                    <div id="podcastOutput"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge" id="statusBadge">
+        <span class="spinner-border spinner-border-sm me-2"></span> Loading...
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatus();
+        });
+
+        // Load system status
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                const badge = document.getElementById('statusBadge');
+                if (data.status === 'ready') {
+                    badge.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> Ready | ${data.knowledge_base.chunks} chunks from ${data.knowledge_base.files} files`;
+                } else {
+                    badge.innerHTML = '<i class="bi bi-exclamation-circle-fill text-warning"></i> Not Ready';
+                }
+            } catch (error) {
+                document.getElementById('statusBadge').innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i> Error';
+            }
+        }
+
+        // ============================================================
+        // Q&A Chatbot Functions
+        // ============================================================
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            // Add user message to chat
+            addMessage(question, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            addMessage('Thinking...', 'assistant', typingId);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question})
+                });
+
+                const data = await response.json();
+
+                // Remove typing indicator
+                document.getElementById(typingId)?.remove();
+
+                if (data.error) {
+                    addMessage('Error: ' + data.error, 'system');
+                } else if (data.type === 'system') {
+                    addMessage(data.message, 'system');
+                } else {
+                    let message = data.answer;
+                    if (data.sources && data.sources.length > 0) {
+                        message += '<div class="sources"><strong>Sources:</strong> ';
+                        message += data.sources.map(s => s.filename || s).join(', ');
+                        message += '</div>';
+                    }
+                    addMessage(message, 'assistant');
+                }
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                addMessage('Error: ' + error.message, 'system');
+            }
+
+            scrollChatToBottom();
+        }
+
+        function addMessage(text, type, id = null) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${type}-message`;
+            if (id) div.id = id;
+            div.innerHTML = text;
+            container.appendChild(div);
+        }
+
+        function scrollChatToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearChat() {
+            if (confirm('Clear conversation history?')) {
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: 'clear'})
+                }).then(() => {
+                    document.getElementById('chatMessages').innerHTML = `
+                        <div class="message system-message">Conversation cleared. Start a new conversation!</div>
+                    `;
+                });
+            }
+        }
+
+        // ============================================================
+        // LinkedIn Generator Functions
+        // ============================================================
+
+        document.getElementById('linkedinForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const loading = document.getElementById('linkedinLoading');
+            const output = document.getElementById('linkedinOutput');
+
+            loading.classList.add('active');
+            output.innerHTML = '';
+
+            const data = {
+                topic: document.getElementById('linkedinTopic').value,
+                format: document.getElementById('linkedinFormat').value,
+                length: document.getElementById('linkedinLength').value,
+                num_hashtags: parseInt(document.getElementById('linkedinHashtags').value),
+                custom_hashtags: document.getElementById('linkedinCustomHashtags').value,
+                create_images: document.getElementById('linkedinCreateImages').checked
+            };
+
+            try {
+                const response = await fetch('/api/generate/linkedin', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    output.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                } else {
+                    let html = '<div class="output-box"><pre>' + escapeHtml(result.content) + '</pre></div>';
+
+                    if (result.download_files && result.download_files.length > 0) {
+                        html += '<div class="download-links">';
+                        result.download_files.forEach(file => {
+                            const relativePath = file.path.replace(/.*output\//, '');
+                            html += `<a href="/api/download/${relativePath}" class="btn btn-sm btn-outline-primary" download><i class="bi bi-download"></i> ${file.name}</a> `;
+                        });
+                        html += '</div>';
+                    }
+
+                    output.innerHTML = html;
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // Blog Generator Functions
+        // ============================================================
+
+        document.getElementById('blogForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const loading = document.getElementById('blogLoading');
+            const output = document.getElementById('blogOutput');
+
+            loading.classList.add('active');
+            output.innerHTML = '';
+
+            const data = {
+                topic: document.getElementById('blogTopic').value,
+                length: document.getElementById('blogLength').value,
+                create_banner: document.getElementById('blogCreateBanner').checked
+            };
+
+            try {
+                const response = await fetch('/api/generate/blog', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    output.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                } else {
+                    let html = `<div class="alert alert-success"><strong>${result.title}</strong><br>Words: ${result.word_count} | Sources: ${result.sources.length}</div>`;
+                    html += '<div class="output-box"><pre>' + escapeHtml(result.content) + '</pre></div>';
+
+                    if (result.download_files && result.download_files.length > 0) {
+                        html += '<div class="download-links">';
+                        result.download_files.forEach(file => {
+                            const relativePath = file.path.replace(/.*output\//, '');
+                            const icon = file.type === 'image' ? 'image' : 'file-earmark-text';
+                            html += `<a href="/api/download/${relativePath}" class="btn btn-sm btn-outline-primary" download><i class="bi bi-${icon}"></i> ${file.name}</a> `;
+                        });
+                        html += '</div>';
+                    }
+
+                    output.innerHTML = html;
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // Podcast Generator Functions
+        // ============================================================
+
+        document.getElementById('podcastForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const loading = document.getElementById('podcastLoading');
+            const output = document.getElementById('podcastOutput');
+
+            loading.classList.add('active');
+            output.innerHTML = '';
+
+            const data = {
+                topic: document.getElementById('podcastTopic').value,
+                length: parseInt(document.getElementById('podcastLength').value),
+                format: document.getElementById('podcastFormat').value,
+                host_voice: document.getElementById('podcastHostVoice').value,
+                guest_voice: document.getElementById('podcastGuestVoice').value,
+                generate_audio: document.getElementById('podcastGenerateAudio').checked
+            };
+
+            try {
+                const response = await fetch('/api/generate/podcast', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    output.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                } else {
+                    let html = `<div class="alert alert-success">Podcast generated! Format: ${result.format} | Words: ${result.word_count} | Sources: ${result.sources.length}</div>`;
+                    html += '<div class="output-box"><pre>' + escapeHtml(result.transcript) + '</pre></div>';
+
+                    if (result.download_files && result.download_files.length > 0) {
+                        html += '<div class="download-links">';
+                        result.download_files.forEach(file => {
+                            const relativePath = file.path.replace(/.*output\//, '');
+                            const icon = file.type === 'audio' ? 'file-earmark-music' : 'file-earmark-text';
+                            html += `<a href="/api/download/${relativePath}" class="btn btn-sm btn-outline-primary" download><i class="bi bi-${icon}"></i> ${file.name}</a> `;
+                        });
+                        html += '</div>';
+                    }
+
+                    output.innerHTML = html;
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // Utility Functions
+        // ============================================================
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

@@ -99,6 +99,31 @@ The `config/secrets/config.json` file should contain:
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
+### Web UI (Recommended)
+
+Launch the web-based interface for easy access to all features:
+
+```bash
+# Start the web UI
+./run_web_ui.sh
+
+# Or manually:
+source venv/bin/activate
+cd src/web
+python app.py
+```
+
+Then open your browser to: **http://localhost:5000**
+
+The web UI provides:
+- 🗨️ **Q&A Chatbot** - Interactive chat interface with conversation history
+- 📱 **LinkedIn Generator** - Generate posts in multiple formats with preview
+- 📝 **Blog Generator** - Create articles with DALL-E 3 banner images
+- 🎙️ **Podcast Generator** - Generate episodes with transcript and audio
+- 📥 **File Downloads** - Download all generated content (MP3, transcripts, images)
+
+### Command Line Interface
+
 ### Q&A Chatbot
 
 ```bash
@@ -175,8 +200,8 @@ python src/main.py version
 - ⚙️ Configurable parameters for all generators
 
 ### Planned Features
-- [ ] Web interface for easier interaction
-- [ ] Custom voice selection for podcasts
+- [x] Web interface for easier interaction ✅
+- [x] Custom voice selection for podcasts ✅
 - [ ] Multi-language support
 - [ ] Batch content generation
 - [ ] Integration with social media APIs
@@ -193,17 +218,18 @@ python src/main.py version
 - **Search**: Hybrid search with BM25 keyword matching
 - **TTS**: OpenAI TTS-1-HD for podcast audio
 - **Audio**: pydub for audio processing
+- **Web UI**: Flask with Bootstrap 5
 - **CLI**: Typer with Rich for beautiful terminal interface
 
 ## Development Status
 
 - [x] Phase 1: Project Setup & Infrastructure ✅
-- [ ] Phase 2: Knowledge Base Ingestion (PDF processing, embeddings)
-- [ ] Phase 3: RAG System & Q&A Chatbot
-- [ ] Phase 4: LinkedIn Post Generator
-- [ ] Phase 5: Blog Generator
-- [ ] Phase 6: Podcast Generator
-- [ ] Phase 7: Agent Orchestration & Advanced Features
+- [x] Phase 2: Knowledge Base Ingestion (PDF processing, embeddings) ✅
+- [x] Phase 3: RAG System & Q&A Chatbot ✅
+- [x] Phase 4: LinkedIn Post Generator ✅
+- [x] Phase 5: Blog Generator ✅
+- [x] Phase 6: Podcast Generator ✅
+- [x] Phase 7: Web UI ✅
 - [ ] Phase 8: Testing & Optimization
 
 ## License
